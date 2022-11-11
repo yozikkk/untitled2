@@ -2,6 +2,7 @@ package websocket;
 
 
 
+import com.google.gson.Gson;
 import model.Message;
 
 import javax.websocket.EncodeException;
@@ -81,12 +82,37 @@ public class WebSocket {
     @OnMessage
     public String handleTextMessage(String message) throws EncodeException, IOException {
 
-        Message messageObj = new Message();
         //messageObj.setFrom(users.get(session.getId()));
-        messageObj.setContent(message);
-        broadcast(messageObj,room);
-        return message;
-    }
+            Message messageObj = new Message();
+
+            if(room.equalsIgnoreCase("all")){
+               // messageObj.setContent("Test");
+                Gson gson = new Gson();
+                Message jsonObjects = gson.fromJson(message,Message.class);
+
+
+
+                messageObj.setWhatsapp(jsonObjects.getWhatsapp());
+                messageObj.setTelegram(jsonObjects.getTelegram());
+                messageObj.setInstagram(jsonObjects.getInstagram());
+                messageObj.setFacebook(jsonObjects.getFacebook());
+                broadcast(messageObj,room);
+
+            }
+            else{
+
+
+                messageObj.setContent(message);
+                broadcast(messageObj,room);
+
+            }
+
+            return message;
+
+
+        }
+
+
 
 
     @OnError
@@ -107,12 +133,22 @@ public class WebSocket {
             synchronized (endpoint) {
                 try {
 
-                    if(users.get(endpoint.session.getId()).equalsIgnoreCase(room)){
+                    if(room.equalsIgnoreCase("all")){
 
+                        System.out.println("sending to all");
+                        endpoint.session.getBasicRemote()
+                                .sendObject(message);
+                    }
+
+
+
+                    if(users.get(endpoint.session.getId()).equalsIgnoreCase(room)){
+                        System.out.println("sending to private");
                         endpoint.session.getBasicRemote()
                                 .sendObject(message);
 
                     }
+
 
 
                 } catch (IOException | EncodeException e) {
@@ -122,6 +158,24 @@ public class WebSocket {
         });
     }
 
+
+    private static void broadcastQueue(Message message,String room){
+        chatEndpoints.forEach(endpoint -> {
+            synchronized (endpoint) {
+                try {
+
+
+                        endpoint.session.getBasicRemote()
+                                .sendObject(message);
+
+
+
+                } catch (IOException | EncodeException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
 
 

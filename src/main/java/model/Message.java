@@ -7,13 +7,49 @@ public class Message {
 
     private String chatid;
 
-
+    private String telegram;
+    private String  whatsapp;
+    private String  facebook;
+    private String  instagram;
 
 
     @Override
 
     public String toString() {
         return super.toString();
+    }
+
+
+    public String getTelegram() {
+        return telegram;
+    }
+
+    public void setTelegram(String telegram) {
+        this.telegram = telegram;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
+    }
+
+    public String getFacebook() {
+        return facebook;
+    }
+
+    public void setFacebook(String facebook) {
+        this.facebook = facebook;
+    }
+
+    public String getInstagram() {
+        return instagram;
+    }
+
+    public void setInstagram(String instagram) {
+        this.instagram = instagram;
     }
 
     public String getChatid() {
