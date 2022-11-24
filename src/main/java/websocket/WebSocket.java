@@ -42,56 +42,23 @@ public class WebSocket {
         chatEndpoints.add(this);
         users.put(session.getId(), username);
 
-        /*
-        Message message = new Message();
-        message.setFrom(username);
-        message.setContent("Connected!");
-        broadcast(message);
-
-         */
     }
 
     @OnClose
     public void onClose(Session session){
         chatEndpoints.remove(this);
-
-        /*&
-        try{
-
-            chatEndpoints.remove(this);
-            /*
-            Message message = new Message();
-            message.setFrom(users.get(session.getId()));
-            message.setContent("Disconnected!");
-            broadcast(message);
-
-
-        }
-
-        catch (IOException e){
-            e.printStackTrace();
-        }
-        catch (EncodeException e){
-            e.printStackTrace();
-        }
-
-             */
     }
 
 
     @OnMessage
     public String handleTextMessage(String message) throws EncodeException, IOException {
 
-        //messageObj.setFrom(users.get(session.getId()));
             Message messageObj = new Message();
 
             if(room.equalsIgnoreCase("all")){
-               // messageObj.setContent("Test");
+
                 Gson gson = new Gson();
                 Message jsonObjects = gson.fromJson(message,Message.class);
-
-
-
                 messageObj.setWhatsapp(jsonObjects.getWhatsapp());
                 messageObj.setTelegram(jsonObjects.getTelegram());
                 messageObj.setInstagram(jsonObjects.getInstagram());
@@ -101,8 +68,10 @@ public class WebSocket {
             }
             else{
 
-
-                messageObj.setContent(message);
+                Gson gson = new Gson();
+                Message jsonObjects = gson.fromJson(message,Message.class);
+                messageObj.setFrom(jsonObjects.getFrom());
+                messageObj.setContent(jsonObjects.getContent());
                 broadcast(messageObj,room);
 
             }
@@ -134,8 +103,6 @@ public class WebSocket {
                 try {
 
                     if(room.equalsIgnoreCase("all")){
-
-                        System.out.println("sending to all");
                         endpoint.session.getBasicRemote()
                                 .sendObject(message);
                     }
@@ -143,7 +110,6 @@ public class WebSocket {
 
 
                     if(users.get(endpoint.session.getId()).equalsIgnoreCase(room)){
-                        System.out.println("sending to private");
                         endpoint.session.getBasicRemote()
                                 .sendObject(message);
 
